@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือ Apps Script สำหรับพยาบาล</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  /* โลกพาสเทลแบบหนังสืออ่านเล่น: หน้า A4 เรียงต่อกัน แต่ละบทมีสีประจำ ศัพท์อยู่ท้ายหน้า */
+  --paper: #FFFBF5;
+  --desk: #F3EEF8;
+  --ink: #33304A;
+  --soft: #5E5A78;
+  --line: #E9E1EF;
+  --pink: #FFD3E0;  --rose: #B8395F;
+  --mint: #C6F0DD;  --teal: #1C7259;
+  --sky: #D3E8FF;   --blue: #2B5FA6;
+  --lav: #E4DBFF;   --grape: #5F46B5;
+  --peach: #FFE0C4; --brown: #94501C;
+  --lemon: #FFF2B0; --amber: #7A5E00;
+  --red-soft: #FFD9D4; --red: #A8322A;
+  --font-display: "Itim", "Mali", "Tahoma", sans-serif;
+  --font-body: "Mali", "Tahoma", sans-serif;
+  --font-code: "JetBrains Mono", "Mali", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--desk); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.75; }
+a { color: var(--blue); }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; line-height: 1.3; margin: 0; }
+p { margin: 0; }
+.book { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 28px 16px 60px; }
+.page { position: relative; width: 210mm; max-width: 100%; min-height: 297mm; background: var(--paper); border-radius: 20px; box-shadow: 0 10px 30px rgba(80, 60, 120, .12); display: flex; flex-direction: column; overflow: hidden; }
+.page-body { flex: 1; padding: 16mm 16mm 10mm; display: flex; flex-direction: column; gap: 18px; }
+.folio { position: absolute; top: 12px; right: 18px; font-family: var(--font-display); font-size: 14px; color: var(--soft); background: #fff; border-radius: 999px; padding: 2px 12px; box-shadow: 0 2px 6px rgba(0,0,0,.05); }
+.chap-head { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 22px; background: var(--c-soft); }
+.chap-head .badge { flex: none; width: 64px; height: 64px; border-radius: 20px; background: #fff; display: grid; place-items: center; box-shadow: 0 3px 0 var(--c-strong); }
+.chap-head .badge svg { width: 40px; height: 40px; }
+.chap-head .eyebrow { font-family: var(--font-display); color: var(--c-strong); font-size: 16px; letter-spacing: .02em; }
+.chap-head h2 { font-size: 30px; }
+.lead { font-size: 18px; }
+h3 { font-size: 22px; color: var(--c-strong, var(--ink)); display: flex; align-items: center; gap: 10px; }
+h3::before { content: ""; width: 12px; height: 12px; border-radius: 4px; background: var(--c-soft, var(--pink)); border: 2px solid var(--c-strong, var(--rose)); transform: rotate(45deg); flex: none; }
+ul, ol { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 4px; }
+.box { border-radius: 16px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+.box svg { flex: none; width: 28px; height: 28px; margin-top: 2px; }
+.box b.label { font-family: var(--font-display); font-weight: 400; font-size: 17px; display: block; }
+.tip { background: var(--mint); }
+.warn { background: var(--red-soft); }
+.try { background: var(--lemon); }
+.note { background: var(--sky); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.card { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; }
+.card h4 { font-size: 19px; margin-bottom: 4px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; border-radius: 14px; overflow: hidden; border: 2px solid var(--line); }
+th { font-family: var(--font-display); font-weight: 400; font-size: 16px; text-align: left; background: var(--c-soft, var(--lav)); padding: 8px 12px; }
+td { padding: 8px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+.table-wrap { overflow-x: auto; }
+.code { position: relative; }
+.code .tag { position: absolute; top: -12px; left: 16px; background: var(--ink); color: #fff; font-family: var(--font-code); font-size: 12px; padding: 2px 10px; border-radius: 999px; }
+pre { margin: 0; background: #2E2A45; color: #F3EEFF; border-radius: 16px; padding: 22px 18px 16px; overflow-x: auto; font-family: var(--font-code); font-size: 12.5px; line-height: 1.6; white-space: pre; }
+pre.prompt { background: #FFF6FA; color: var(--ink); border: 2px dashed var(--rose); font-family: var(--font-body); font-size: 14px; white-space: pre-wrap; }
+.copy { position: absolute; top: 10px; right: 10px; font-family: var(--font-display); font-size: 14px; border: 0; border-radius: 999px; padding: 4px 14px; background: var(--lemon); color: var(--ink); cursor: pointer; }
+.copy:focus-visible, a:focus-visible { outline: 3px solid var(--grape); outline-offset: 2px; }
+.steps { list-style: none; padding: 0; counter-reset: s; gap: 10px; }
+.steps > li { counter-increment: s; position: relative; padding: 10px 14px 10px 54px; background: #fff; border: 2px solid var(--line); border-radius: 16px; }
+.steps > li::before { content: counter(s); position: absolute; left: 12px; top: 10px; width: 30px; height: 30px; border-radius: 50%; background: var(--c-strong, var(--rose)); color: #fff; font-family: var(--font-display); display: grid; place-items: center; font-size: 16px; }
+.steps.start-3 { counter-reset: s 2; }
+.steps.start-9 { counter-reset: s 8; }
+.kbd { font-family: var(--font-code); font-size: .88em; background: var(--lav); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+.src { font-size: 12.5px; color: var(--soft); }
+sup a { text-decoration: none; font-size: 11px; }
+/* ท้ายหน้า: ศัพท์ในหน้านี้ */
+.terms { background: var(--c-soft, var(--lav)); border-top: 3px dotted var(--c-strong, var(--grape)); padding: 12px 16mm 16px; font-size: 13.5px; line-height: 1.55; }
+.terms .t-head { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 16px; color: var(--c-strong, var(--grape)); margin-bottom: 6px; }
+.terms .t-head svg { width: 20px; height: 20px; }
+.terms dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 4px 18px; }
+.terms dl div { display: flex; gap: 6px; }
+.terms dt { font-weight: 700; white-space: nowrap; }
+.terms dd { margin: 0; }
+/* สีประจำบท */
+.c-pink { --c-soft: var(--pink); --c-strong: var(--rose); }
+.c-mint { --c-soft: var(--mint); --c-strong: var(--teal); }
+.c-sky { --c-soft: var(--sky); --c-strong: var(--blue); }
+.c-lav { --c-soft: var(--lav); --c-strong: var(--grape); }
+.c-peach { --c-soft: var(--peach); --c-strong: var(--brown); }
+.c-lemon { --c-soft: var(--lemon); --c-strong: var(--amber); }
+/* หน้าปก */
+.cover { background: radial-gradient(circle at 85% 12%, #FFE7EE 0 18%, transparent 19%), radial-gradient(circle at 8% 88%, #E2F7EC 0 16%, transparent 17%), linear-gradient(160deg, #FFE3EC 0%, #EEE6FF 45%, #DDF3FF 100%); }
+.cover .page-body { padding: 18mm 16mm; gap: 14px; }
+.cover .pill { align-self: flex-start; font-family: var(--font-display); font-size: 17px; background: #fff; color: var(--rose); padding: 4px 18px; border-radius: 999px; box-shadow: 0 3px 0 var(--pink); }
+.cover h1 { font-size: 46px; line-height: 1.2; }
+.cover h1 span { color: var(--grape); }
+.cover .sub { font-size: 19px; color: var(--soft); max-width: 30em; }
+.cover .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.cover .chips span { font-family: var(--font-display); font-size: 15px; padding: 4px 14px; border-radius: 999px; }
+.cover .art { flex: 1; display: grid; place-items: center; min-height: 340px; }
+.cover .art svg { width: 100%; max-width: 520px; height: auto; }
+.cover .by { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-size: 15px; color: var(--soft); }
+.toc { list-style: none; padding: 0; gap: 10px; }
+.toc li { display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: center; background: #fff; border-radius: 16px; padding: 10px 14px; border: 2px solid var(--line); }
+.toc .n { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-family: var(--font-display); font-size: 22px; background: var(--c-soft); color: var(--c-strong); }
+.toc .what { font-size: 14px; color: var(--soft); display: block; }
+.toc .pg { font-family: var(--font-display); color: var(--soft); }
+@media (max-width: 640px) {
+  .page { min-height: 0; border-radius: 16px; }
+  .page-body { padding: 24px 18px 18px; }
+  .terms { padding: 12px 18px 16px; }
+  .cover h1 { font-size: 34px; }
+  .chap-head h2 { font-size: 24px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .float { animation: bob 5s ease-in-out infinite; transform-box: fill-box; }
+  .float.d2 { animation-delay: -2s; }
+  .float.d3 { animation-delay: -3.5s; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+}
+@media print {
+  @page { size: A4; margin: 0; }
+  body { background: #fff; }
+  .book { padding: 0; gap: 0; }
+  .page { width: 210mm; min-height: 297mm; border-radius: 0; box-shadow: none; break-after: page; }
+  .copy { display: none; }
+}
+</style>
+</head>
+<body>
+<!-- ไอคอนที่ใช้ซ้ำ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5A1.5 1.5 0 0 1 4 17.5z" fill="currentColor" opacity=".25"/><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5A1.5 1.5 0 0 1 4 17.5zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5l5 3.5-5 3.5z" fill="currentColor"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.5M12 7.8v.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<main class="book">
+
+<!-- ===== หน้า 1: ปก ===== -->
+<section class="page cover" aria-label="หน้าปก">
+  <div class="page-body">
+    <p class="pill">คู่มือฉบับมือใหม่ · สำหรับพยาบาล</p>
+    <h1>สร้างเว็บแอปด้วย<br><span>Google Apps Script</span></h1>
+    <p class="sub">จากสมุดจดบนหอผู้ป่วย สู่แอปบนแท็บเล็ตที่ทั้งหอใช้ร่วมกัน ทำเองได้ในหนึ่งชั่วโมง โดยมี AI เป็นผู้ช่วยเขียนโค้ด</p>
+    <div class="chips">
+      <span style="background:var(--mint);color:var(--teal)">ไม่ต้องเขียนโค้ดเป็น</span>
+      <span style="background:var(--sky);color:var(--blue)">ใช้ Claude / ChatGPT ช่วยเขียน</span>
+      <span style="background:var(--lemon);color:var(--amber)">เก็บข้อมูลใน Google Sheets</span>
+    </div>
+    <div class="art">
+      <svg viewBox="0 0 520 400" role="img" aria-label="ภาพการ์ตูนพยาบาลถือแท็บเล็ตที่แสดงโค้ด รอบตัวมีไอคอนคลาวด์ ตาราง และหัวใจ">
+        <!-- พื้นหลัง -->
+        <ellipse cx="260" cy="372" rx="170" ry="16" fill="#E3D8F2"/>
+        <circle cx="260" cy="205" r="150" fill="#FFFFFF" opacity=".75"/>
+        <!-- ไอคอนลอย: คลาวด์ -->
+        <g transform="translate(52 70)"><g class="float">
+          <rect x="0" y="0" width="96" height="66" rx="18" fill="#D3E8FF"/>
+          <path d="M28 44h40a12 12 0 0 0 0-24 16 16 0 0 0-30-4 11 11 0 0 0-10 28z" fill="#fff" stroke="#2B5FA6" stroke-width="3" stroke-linejoin="round"/>
+        </g></g>
+        <!-- ไอคอนลอย: ตารางชีต -->
+        <g transform="translate(392 64)"><g class="float d2">
+          <rect x="0" y="0" width="84" height="74" rx="18" fill="#C6F0DD"/>
+          <rect x="18" y="16" width="48" height="42" rx="5" fill="#fff" stroke="#1C7259" stroke-width="3"/>
+          <path d="M18 30h48M18 44h48M34 16v42" stroke="#1C7259" stroke-width="3"/>
+        </g></g>
+        <!-- ไอคอนลอย: หัวใจ -->
+        <g transform="translate(410 214)"><g class="float d3">
+          <rect x="0" y="0" width="70" height="64" rx="18" fill="#FFD3E0"/>
+          <path d="M35 47s-17-10-17-21a9 9 0 0 1 17-4 9 9 0 0 1 17 4c0 11-17 21-17 21z" fill="#fff" stroke="#B8395F" stroke-width="3" stroke-linejoin="round"/>
+        </g></g>
+        <!-- ไอคอนลอย: เฟือง -->
+        <g transform="translate(44 222)"><g class="float d2">
+          <rect x="0" y="0" width="70" height="64" rx="18" fill="#FFF2B0"/>
+          <circle cx="35" cy="32" r="12" fill="#fff" stroke="#7A5E00" stroke-width="3"/>
+          <path d="M35 12v6M35 46v6M15 32h6M49 32h6M21 18l4 4M45 42l4 4M49 18l-4 4M25 42l-4 4" stroke="#7A5E00" stroke-width="3" stroke-linecap="round"/>
+        </g></g>
+        <!-- ประกาย -->
+        <path d="M170 60l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#FFC6D8"/>
+        <path d="M360 300l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#C9B8FF"/>
+        <!-- ตัวพยาบาล: ลำตัว -->
+        <path d="M168 372c0-70 38-108 92-108s92 38 92 108z" fill="#9FE0C6"/>
+        <path d="M232 266l28 40 28-40" fill="#7FCFAF"/>
+        <path d="M236 268l24 34 24-34" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+        <!-- กระเป๋าเสื้อ + ปากกา -->
+        <rect x="292" y="312" width="34" height="28" rx="6" fill="#7FCFAF"/>
+        <rect x="300" y="300" width="5" height="22" rx="2.5" fill="#5F46B5"/>
+        <rect x="309" y="304" width="5" height="18" rx="2.5" fill="#B8395F"/>
+        <!-- คอ -->
+        <rect x="244" y="232" width="32" height="38" rx="12" fill="#F6C7AE"/>
+        <!-- ผมด้านหลัง + มวยผม -->
+        <circle cx="260" cy="120" r="24" fill="#5B3A2E"/>
+        <ellipse cx="260" cy="182" rx="72" ry="76" fill="#5B3A2E"/>
+        <!-- หน้า -->
+        <ellipse cx="260" cy="192" rx="60" ry="62" fill="#FFDCC8"/>
+        <!-- หมวกพยาบาล -->
+        <path d="M206 140c10-26 98-26 108 0l-6 18c-30-10-66-10-96 0z" fill="#FFFFFF" stroke="#E9E1EF" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M260 154s-9-5-9-11a5 5 0 0 1 9-2 5 5 0 0 1 9 2c0 6-9 11-9 11z" fill="#FF8FB0"/>
+        <!-- ผมหน้าม้า -->
+        <path d="M202 172c4-20 22-30 40-28-6 10-4 18 2 22-18-2-30 0-42 6zM318 172c-4-20-22-30-40-28 6 10 4 18-2 22 18-2 30 0 42 6z" fill="#5B3A2E"/>
+        <!-- ตา -->
+        <ellipse cx="238" cy="196" rx="7" ry="9" fill="#33304A"/>
+        <ellipse cx="282" cy="196" rx="7" ry="9" fill="#33304A"/>
+        <circle cx="240.5" cy="192.5" r="2.6" fill="#fff"/>
+        <circle cx="284.5" cy="192.5" r="2.6" fill="#fff"/>
+        <!-- แก้ม + ปาก -->
+        <ellipse cx="223" cy="216" rx="11" ry="7" fill="#FFB3C7" opacity=".8"/>
+        <ellipse cx="297" cy="216" rx="11" ry="7" fill="#FFB3C7" opacity=".8"/>
+        <path d="M248 222c6 8 18 8 24 0" fill="none" stroke="#B8395F" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- หูฟังแพทย์ -->
+        <path d="M222 274c-6 30 4 52 24 56M298 274c6 30-4 52-24 56" fill="none" stroke="#6E6A88" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="260" cy="334" r="11" fill="#D3E8FF" stroke="#6E6A88" stroke-width="4"/>
+        <!-- แขน + แท็บเล็ต -->
+        <path d="M188 330c10-10 26-14 40-10" fill="none" stroke="#9FE0C6" stroke-width="22" stroke-linecap="round"/>
+        <g transform="rotate(-8 150 300)">
+          <rect x="92" y="252" width="126" height="94" rx="14" fill="#5F46B5"/>
+          <rect x="102" y="262" width="106" height="74" rx="8" fill="#F3EEFF"/>
+          <text x="155" y="292" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="20" font-weight="600" fill="#5F46B5">&lt;/&gt;</text>
+          <rect x="114" y="304" width="82" height="7" rx="3.5" fill="#FFD3E0"/>
+          <rect x="114" y="317" width="56" height="7" rx="3.5" fill="#C6F0DD"/>
+        </g>
+        <circle cx="212" cy="322" r="13" fill="#FFDCC8"/>
+      </svg>
+    </div>
+    <div class="by"><span>จัดทำและรวบรวมเนื้อหาโดย RIKNIS</span><span>ฉบับพฤศจิกายน 2569</span></div>
+  </div>
+</section>
+
+<!-- ===== หน้า 2: วิธีใช้ + สารบัญ ===== -->
+<section class="page c-lav" aria-label="วิธีใช้คู่มือและสารบัญ">
+  <span class="folio">2</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 24 24" style="color:var(--grape)"><use href="#i-book"/></svg></div>
+      <div><p class="eyebrow">ก่อนเริ่มอ่าน</p><h2>วิธีใช้คู่มือเล่มนี้</h2></div>
+    </div>
+    <p class="lead">อ่านเรียงบทไปเรื่อย ๆ พอถึงบทที่ 5 คุณจะได้แอป "บันทึกอุณหภูมิตู้เย็นเก็บยา" ที่ใช้งานได้จริง 1 ตัว แอปนี้ทำทุกเวรและไม่มีข้อมูลผู้ป่วยเลย จึงเหมาะเป็นแอปแรก</p>
+    <div class="cards">
+      <div class="card"><h4>สิ่งที่ต้องมี</h4><p>บัญชี Google · โน้ตบุ๊กที่มี Chrome · แท็บเล็ตหรือมือถือไว้ทดสอบ · เวลาราว 60 นาที</p></div>
+      <div class="card"><h4>ศัพท์อยู่ท้ายหน้า</h4><p>เจอคำไอทีที่ไม่คุ้น ดูแถบสีท้ายหน้านั้นได้เลย และมีอภิธานศัพท์รวมท้ายเล่ม</p></div>
+    </div>
+    <h3>สารบัญ</h3>
+    <ol class="toc">
+      <li class="c-mint"><span class="n">1</span><span>Apps Script คืออะไร<span class="what">ทำไมเหมาะกับพยาบาล ต่างจากแอปใน Claude/ChatGPT ยังไง</span></span><span class="pg">3</span></li>
+      <li class="c-sky"><span class="n">2</span><span>ข้างในแอปมีอะไร<span class="what">5 ส่วนของแอป และ 2 ไฟล์ที่เราเขียนเอง</span></span><span class="pg">4</span></li>
+      <li class="c-lemon"><span class="n">3</span><span>เตรียมของให้พร้อม<span class="what">บัญชี อุปกรณ์ และขีดจำกัดที่ควรรู้</span></span><span class="pg">5</span></li>
+      <li class="c-peach"><span class="n">4</span><span>เส้นทาง 10 ขั้น<span class="what">ภาพรวมตั้งแต่วางแผนจนแชร์ลิงก์</span></span><span class="pg">6</span></li>
+      <li class="c-pink"><span class="n">5</span><span>ลงมือสร้างแอปแรก<span class="what">ทีละขั้น พร้อมโค้ดเต็มให้คัดลอก</span></span><span class="pg">7–10</span></li>
+      <li class="c-lav"><span class="n">6</span><span>สั่ง AI ให้เขียนโค้ด<span class="what">Prompt สร้างแอปใหม่ สั่งแก้ และเพิ่มฟีเจอร์</span></span><span class="pg">11–12</span></li>
+      <li class="c-sky"><span class="n">7</span><span>แอปไม่ทำงาน ทำยังไงดี<span class="what">เช็กลิสต์ทดสอบและปัญหาที่เจอบ่อย</span></span><span class="pg">13</span></li>
+      <li class="c-pink"><span class="n">8</span><span>ปลอดภัยไว้ก่อน<span class="what">ข้อมูลผู้ป่วย PDPA และแนวทาง AI ของ สคส.</span></span><span class="pg">14</span></li>
+      <li class="c-mint"><span class="n">9</span><span>ไปต่อได้อีก<span class="what">ไอเดียต่อยอด อภิธานศัพท์ และแหล่งอ้างอิง</span></span><span class="pg">15–17</span></li>
+    </ol>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Apps Script</dt><dd>เครื่องมือเขียนโปรแกรมฟรีของ Google</dd></div>
+      <div><dt>เว็บแอป</dt><dd>โปรแกรมที่เปิดใช้ผ่านเบราว์เซอร์ ไม่ต้องติดตั้ง</dd></div>
+      <div><dt>Google Sheets</dt><dd>ตารางคำนวณออนไลน์ของ Google คล้าย Excel</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 3: บท 1 ===== -->
+<section class="page c-mint" aria-label="บทที่ 1">
+  <span class="folio">3</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--teal)"><path d="M10 26h20a6 6 0 0 0 0-12 8 8 0 0 0-15-2 6 6 0 0 0-5 14z" fill="#fff" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M17 20l-3 3 3 3M23 20l3 3-3 3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 1</p><h2>Google Apps Script คืออะไร</h2></div>
+    </div>
+    <p class="lead">Apps Script คือเครื่องมือฟรีจาก Google ให้เราเขียนโปรแกรมเล็ก ๆ ทำงานกับ Google Sheets, Docs, Gmail, Drive และสร้างเว็บแอปได้ Google เรียกมันว่าแพลตฟอร์ม JavaScript บนคลาวด์ที่ทำงานบน Google Drive<sup><a href="#ref-1">[1]</a></sup></p>
+    <h3>ทำไมมือใหม่ถึงชอบ</h3>
+    <div class="cards">
+      <div class="card"><h4>ไม่ต้องติดตั้ง</h4><p>เขียนโค้ดในเบราว์เซอร์ โค้ดเก็บใน Drive และทำงานบนเซิร์ฟเวอร์ของ Google<sup><a href="#ref-2">[2]</a></sup></p></div>
+      <div class="card"><h4>มีฐานข้อมูลให้แล้ว</h4><p>ใช้ Google Sheets เป็นที่เก็บข้อมูล หน้าตาคุ้นเคยเหมือน Excel</p></div>
+      <div class="card"><h4>มีที่ตั้งแอปฟรี</h4><p>กด Deploy แล้วได้ลิงก์เปิดผ่านเบราว์เซอร์ทันที<sup><a href="#ref-3">[3]</a></sup></p></div>
+      <div class="card"><h4>คุมคนเข้าได้</h4><p>เลือกได้ว่าเปิดเฉพาะเรา คนในองค์กร หรือคนที่มีบัญชี Google</p></div>
+    </div>
+    <h3>เทียบกับแอปที่ทำใน Claude หรือ ChatGPT</h3>
+    <div class="table-wrap"><table>
+      <tr><th>เรื่อง</th><th>แอปหน้าเดียวจาก Claude/ChatGPT</th><th>เว็บแอป Apps Script</th></tr>
+      <tr><td>เก็บข้อมูลรวมกันหลายคน</td><td>ไม่ได้ เก็บได้แค่ในเครื่องเดียว</td><td><b>ได้</b> ทุกคนบันทึกลงชีตแผ่นเดียวกัน</td></tr>
+      <tr><td>เหมาะกับ</td><td>เครื่องคำนวณ แบบประเมินคะแนน</td><td>บันทึกประจำเวร เช็กลิสต์ นับสต็อก</td></tr>
+      <tr><td>ความยาก</td><td>ง่ายมาก</td><td>ปานกลาง ต้องคัดลอกโค้ดไปวางเอง</td></tr>
+    </table></div>
+    <div class="box tip"><svg viewBox="0 0 24 24" style="color:var(--teal)"><use href="#i-bulb"/></svg><div><b class="label">สรุปสั้น ๆ</b>ถ้าแอปต้อง <b>จำข้อมูลและใช้ร่วมกันทั้งหอ</b> Apps Script คือก้าวถัดไปที่ง่ายที่สุด</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Script</dt><dd>ชุดคำสั่งสั้น ๆ บอกคอมพิวเตอร์ให้ทำงาน</dd></div>
+      <div><dt>JavaScript</dt><dd>ภาษาโปรแกรมยอดนิยมบนเว็บ ที่ Apps Script ใช้</dd></div>
+      <div><dt>Cloud</dt><dd>คอมพิวเตอร์ของผู้ให้บริการที่เราใช้ผ่านเน็ต</dd></div>
+      <div><dt>Platform</dt><dd>พื้นที่พร้อมเครื่องมือไว้สร้างและรันโปรแกรม</dd></div>
+      <div><dt>Deploy</dt><dd>นำแอปขึ้นใช้งานจริง ได้ลิงก์ให้คนอื่นเปิด</dd></div>
+      <div><dt>Google Workspace</dt><dd>ชุดแอปทำงานของ Google มักหมายถึงบัญชีองค์กร</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 4: บท 2 ===== -->
+<section class="page c-sky" aria-label="บทที่ 2">
+  <span class="folio">4</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--blue)"><rect x="7" y="7" width="11" height="11" rx="3" fill="#fff" stroke="currentColor" stroke-width="2.6"/><rect x="22" y="7" width="11" height="11" rx="3" fill="currentColor" opacity=".3" stroke="currentColor" stroke-width="2.6"/><rect x="7" y="22" width="11" height="11" rx="3" fill="currentColor" opacity=".3" stroke="currentColor" stroke-width="2.6"/><rect x="22" y="22" width="11" height="11" rx="3" fill="#fff" stroke="currentColor" stroke-width="2.6"/></svg></div>
+      <div><p class="eyebrow">บทที่ 2</p><h2>ข้างในแอปมีอะไรบ้าง</h2></div>
+    </div>
+    <p class="lead">เว็บแอป Apps Script มี 5 ส่วนเหมือนที่เรียนในคลาส แต่เราเขียนเองแค่ <b>2 ไฟล์</b> คือ Index.html กับ Code.gs ที่เหลือ Google เตรียมไว้ให้</p>
+    <div class="flow" role="img" aria-label="ภาพเส้นทางข้อมูล: พยาบาลเปิดลิงก์ ไปที่ Index.html ส่งผ่าน google.script.run ไปที่ Code.gs แล้วบันทึกลง Google Sheets ทั้งหมดอยู่บนเซิร์ฟเวอร์ของ Google">
+      <div class="node user"><b>พยาบาล</b><span>เปิดลิงก์บนแท็บเล็ต</span></div>
+      <div class="arrow" aria-hidden="true">⇄</div>
+      <div class="host">
+        <p class="host-name">Hosting · เซิร์ฟเวอร์ของ Google</p>
+        <div class="host-row">
+          <div class="node mine"><b>Index.html</b><span>หน้าบ้าน (Frontend)</span><em>เราเขียน</em></div>
+          <div class="arrow" aria-hidden="true">⇄<small>API</small></div>
+          <div class="node mine"><b>Code.gs</b><span>หลังบ้าน (Backend)</span><em>เราเขียน</em></div>
+          <div class="arrow" aria-hidden="true">⇄</div>
+          <div class="node"><b>Google Sheets</b><span>ฐานข้อมูล (Database)</span><em>Google ให้</em></div>
+        </div>
+      </div>
+    </div>
+    <style>
+      .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .flow .node { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; text-align: center; min-width: 120px; flex: 1; }
+      .flow .node b { font-family: var(--font-display); font-weight: 400; font-size: 18px; }
+      .flow .node span { font-size: 13px; color: var(--soft); }
+      .flow .node em { font-style: normal; font-size: 12px; margin-top: 4px; align-self: center; padding: 0 10px; border-radius: 999px; background: var(--line); }
+      .flow .node.mine { background: var(--sky); border-color: var(--blue); }
+      .flow .node.mine em { background: var(--blue); color: #fff; }
+      .flow .node.user { flex: 0 0 120px; }
+      .flow .arrow { font-size: 22px; color: var(--soft); display: flex; flex-direction: column; align-items: center; line-height: 1; }
+      .flow .arrow small { font-family: var(--font-display); font-size: 12px; color: var(--blue); }
+      .flow .host { flex: 1 1 420px; border: 2px dashed #9DBFE8; background: #F4F9FF; border-radius: 18px; padding: 10px 12px 12px; }
+      .flow .host-name { font-family: var(--font-display); color: var(--blue); font-size: 15px; margin-bottom: 8px; }
+      .flow .host-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    </style>
+    <h3>สองคำที่ต้องรู้จัก</h3>
+    <div class="cards">
+      <div class="card"><h4>doGet = ประตูหน้าบ้าน</h4><p>ทุกครั้งที่มีคนเปิดลิงก์แอป Apps Script จะเรียกฟังก์ชันชื่อนี้ สคริปต์ที่เป็นเว็บแอปได้ต้องมี doGet(e) หรือ doPost(e)<sup><a href="#ref-3">[3]</a></sup></p></div>
+      <div class="card"><h4>google.script.run = พนักงานรับออเดอร์</h4><p>ให้หน้าเว็บสั่งงานโค้ดใน Code.gs ทำงานแบบไม่รอคำตอบ จึงต้องบอกด้วยว่าสำเร็จแล้วทำอะไร (withSuccessHandler) และพังแล้วทำอะไร (withFailureHandler)<sup><a href="#ref-4">[4]</a></sup></p></div>
+    </div>
+    <div class="box note"><svg viewBox="0 0 24 24" style="color:var(--blue)"><use href="#i-info"/></svg><div><b class="label">สคริปต์มี 2 แบบ</b><b>Bound script</b> สร้างจากในชีตด้วยเมนู ส่วนขยาย (Extensions) &gt; Apps Script ติดอยู่กับชีตนั้น ใช้สิทธิ์เดียวกับชีต คู่มือนี้ใช้แบบนี้<sup><a href="#ref-6">[6]</a></sup> ส่วน <b>Standalone script</b> สร้างจาก Drive ไม่ผูกกับไฟล์ไหน</div></div>
+    <div class="box warn"><svg viewBox="0 0 24 24" style="color:var(--red)"><use href="#i-alert"/></svg><div><b class="label">ระวังคนที่มีสิทธิ์แก้ชีต</b>ใครแก้ชีตได้ ก็เปิดและรันโค้ดได้ด้วย ส่วนคนที่ดูได้อย่างเดียวเปิดตัวแก้โค้ดไม่ได้<sup><a href="#ref-6">[6]</a></sup> และฟังก์ชันที่ชื่อลงท้ายด้วย _ หน้าเว็บจะเรียกใช้ไม่ได้<sup><a href="#ref-4">[4]</a></sup></div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Frontend</dt><dd>หน้าบ้าน ส่วนที่ผู้ใช้เห็นและกด</dd></div>
+      <div><dt>Backend</dt><dd>หลังบ้าน ส่วนที่ตรวจ คำนวณ บันทึก</dd></div>
+      <div><dt>API</dt><dd>ตัวเชื่อมให้โปรแกรมคุยกัน</dd></div>
+      <div><dt>HTML</dt><dd>ภาษากำหนดโครงสร้างหน้าเว็บ</dd></div>
+      <div><dt>.gs</dt><dd>ไฟล์โค้ดหลังบ้านของ Apps Script</dd></div>
+      <div><dt>Function</dt><dd>ชุดคำสั่งที่ตั้งชื่อไว้ เรียกใช้ซ้ำได้</dd></div>
+      <div><dt>Handler</dt><dd>คำสั่งที่รอรับเหตุการณ์ เช่น บันทึกสำเร็จ</dd></div>
+      <div><dt>Asynchronous</dt><dd>สั่งแล้วไม่รอ ผลมาทีหลัง เหมือนส่งใบ Lab</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 5: บท 3 ===== -->
+<section class="page c-lemon" aria-label="บทที่ 3">
+  <span class="folio">5</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--amber)"><rect x="8" y="13" width="24" height="20" rx="6" fill="#fff" stroke="currentColor" stroke-width="2.6"/><path d="M15 13v-3a5 5 0 0 1 10 0v3M8 21h24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="17" y="18" width="6" height="6" rx="2" fill="currentColor"/></svg></div>
+      <div><p class="eyebrow">บทที่ 3</p><h2>เตรียมของให้พร้อม</h2></div>
+    </div>
+    <p class="lead">เรื่องเดียวที่ต้องตัดสินใจก่อนเริ่ม คือจะใช้บัญชี Google แบบไหน เพราะชีตที่เก็บข้อมูลและตัวแอปจะเป็นของบัญชีนั้น</p>
+    <div class="table-wrap"><table>
+      <tr><th>บัญชี</th><th>เหมาะกับ</th><th>ข้อควรรู้</th></tr>
+      <tr><td>ส่วนตัว (@gmail.com)</td><td>ฝึกหัด ทดลอง แอปที่ไม่มีข้อมูลอ่อนไหว</td><td>ขีดจำกัดต่ำกว่า ข้อมูลอยู่ในบัญชีส่วนตัว</td></tr>
+      <tr><td>องค์กร (Google Workspace ของ รพ.)</td><td>แอปที่ใช้ในหน่วยงานจริง</td><td>จำกัดให้เฉพาะคนในองค์กรได้ แต่ผู้ดูแลระบบอาจปิด Apps Script ไว้ ถาม IT ก่อน</td></tr>
+    </table></div>
+    <div class="box tip"><svg viewBox="0 0 24 24" style="color:var(--teal)"><use href="#i-bulb"/></svg><div><b class="label">ลำดับที่แนะนำ</b>ฝึกด้วยบัญชีส่วนตัวและข้อมูลสมมติก่อน พอจะใช้จริงในหอ ค่อยสร้างใหม่ในบัญชีองค์กรตามที่ฝ่าย IT อนุญาต</div></div>
+    <h3>อุปกรณ์</h3>
+    <ul>
+      <li><b>โน้ตบุ๊ก + Chrome:</b> ใช้สร้างและแก้โค้ด หน้าแก้โค้ดใช้บนแท็บเล็ตไม่สะดวก</li>
+      <li><b>แท็บเล็ตหรือมือถือ:</b> ใช้ทดสอบเหมือนผู้ใช้จริง</li>
+      <li><b>ภาษาเมนู:</b> คู่มือเขียนทั้งชื่อไทยและอังกฤษ หน้าแก้โค้ดส่วนใหญ่เป็นภาษาอังกฤษ</li>
+    </ul>
+    <h3>ขีดจำกัด (Quota) ที่ควรรู้</h3>
+    <p>แอปบันทึกของหอใช้ไม่ถึงขีดจำกัดเหล่านี้ แต่ควรรู้ไว้ตอนต่อยอด ขีดจำกัดนับต่อผู้ใช้ และเริ่มนับใหม่ 24 ชั่วโมงหลังคำขอแรก<sup><a href="#ref-9">[9]</a></sup></p>
+    <div class="table-wrap"><table>
+      <tr><th>เรื่อง</th><th>บัญชีส่วนตัว</th><th>บัญชี Workspace</th></tr>
+      <tr><td>เวลารันสคริปต์ต่อครั้ง</td><td>6 นาที</td><td>6 นาที</td></tr>
+      <tr><td>ผู้รับอีเมลต่อวัน</td><td>100</td><td>1,500</td></tr>
+      <tr><td>เวลารวมของทริกเกอร์ต่อวัน</td><td>90 นาที</td><td>6 ชั่วโมง</td></tr>
+      <tr><td>การรันพร้อมกันต่อผู้ใช้</td><td>30</td><td>30</td></tr>
+    </table></div>
+    <p class="src">ที่มา: Google, Quotas for Google Services<sup><a href="#ref-9">[9]</a></sup> ตัวเลขเปลี่ยนได้โดยไม่แจ้งล่วงหน้า · หน้าเว็บเรียก google.script.run พร้อมกันได้ 10 คำสั่ง<sup><a href="#ref-4">[4]</a></sup></p>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Account</dt><dd>ชื่อผู้ใช้และรหัสผ่านที่ใช้เข้าบริการ</dd></div>
+      <div><dt>Quota</dt><dd>ปริมาณสูงสุดที่ใช้ได้ต่อวันหรือต่อครั้ง</dd></div>
+      <div><dt>Trigger</dt><dd>ตัวตั้งเวลาให้สคริปต์ทำงานเอง เช่น ทุก 8 โมง</dd></div>
+      <div><dt>Execution</dt><dd>การรันสคริปต์ 1 ครั้ง</dd></div>
+      <div><dt>IT</dt><dd>เทคโนโลยีสารสนเทศ / ฝ่ายคอมพิวเตอร์ของ รพ.</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 6: บท 4 ===== -->
+<section class="page c-peach" aria-label="บทที่ 4">
+  <span class="folio">6</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--brown)"><path d="M8 32c6 0 6-8 12-8s6-8 12-8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="1 5"/><circle cx="8" cy="32" r="3.5" fill="currentColor"/><path d="M28 8h6v10h-6z" fill="#fff" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M28 8v22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 4</p><h2>เส้นทาง 10 ขั้น</h2></div>
+    </div>
+    <p class="lead">แอปทุกตัวเดินตาม 3 ช่วงนี้ ช่วงแรกทำบนกระดาษก่อนแตะคอมพิวเตอร์ และขั้น 5–8 จะวนซ้ำหลายรอบเสมอ เป็นเรื่องปกติ</p>
+    <div class="phase">
+      <p class="ph-name">ช่วง A · วางแผนบนกระดาษ</p>
+      <ol class="steps">
+        <li><b>นิยามปัญหาและ MVP</b> ใครใช้ แก้ปัญหาอะไร เวอร์ชันแรกต้องทำอะไรได้</li>
+        <li><b>ออกแบบตารางข้อมูล</b> แต่ละช่อง = หัวคอลัมน์ในชีต ห้ามมีช่องข้อมูลสีแดง (บทที่ 8)</li>
+      </ol>
+    </div>
+    <div class="phase">
+      <p class="ph-name">ช่วง B · สร้างบนโน้ตบุ๊ก</p>
+      <ol class="steps start-3">
+        <li><b>สร้าง Google Sheets</b> ใส่หัวคอลัมน์แถวแรก</li>
+        <li><b>เปิดตัวแก้โค้ด</b> จากเมนู ส่วนขยาย (Extensions) &gt; Apps Script</li>
+        <li><b>ให้ AI เขียนโค้ด</b> Code.gs และ Index.html ด้วย Prompt ในบทที่ 6</li>
+        <li><b>วางโค้ด บันทึก อนุญาตสิทธิ์</b> รันฟังก์ชันหนึ่งครั้งจากตัวแก้โค้ดเพื่อให้หน้าขอสิทธิ์ขึ้น<sup><a href="#ref-8">[8]</a></sup></li>
+        <li><b>เปิดลิงก์ทดสอบ</b> Deploy &gt; Test deployments<sup><a href="#ref-3">[3]</a></sup></li>
+        <li><b>ทดสอบตามเช็กลิสต์</b> เจอปัญหา → สั่ง AI แก้ → วนกลับขั้น 5</li>
+      </ol>
+    </div>
+    <div class="phase">
+      <p class="ph-name">ช่วง C · ใช้งานจริง</p>
+      <ol class="steps start-9">
+        <li><b>Deploy เป็นเว็บแอป</b> Deploy &gt; New deployment &gt; Web app ได้ลิงก์ลงท้าย /exec<sup><a href="#ref-3">[3]</a></sup></li>
+        <li><b>แชร์และดูแล</b> แก้โค้ดแล้วต้อง Deploy เป็นเวอร์ชันใหม่ ไม่งั้นลิงก์เดิมยังเป็นโค้ดเก่า<sup><a href="#ref-10">[10]</a></sup></li>
+      </ol>
+    </div>
+    <style>
+      .phase { display: flex; flex-direction: column; gap: 8px; }
+      .ph-name { font-family: var(--font-display); font-size: 17px; color: var(--brown); background: var(--peach); align-self: flex-start; padding: 2px 14px; border-radius: 999px; }
+    </style>
+    <div class="box try"><svg viewBox="0 0 24 24" style="color:var(--amber)"><use href="#i-bulb"/></svg><div><b class="label">จำง่าย ๆ</b>ลิงก์ทดสอบ (/dev) = เห็นโค้ดล่าสุดเสมอ ใช้ได้เฉพาะคนสร้าง · ลิงก์ /exec = เวอร์ชันที่เผยแพร่แล้ว ให้คนอื่นใช้</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Workflow</dt><dd>ลำดับขั้นตอนการทำงานตั้งแต่ต้นจนจบ</dd></div>
+      <div><dt>MVP</dt><dd>Minimum Viable Product เวอร์ชันแรกที่เล็กที่สุดแต่ใช้ได้</dd></div>
+      <div><dt>Prompt</dt><dd>คำสั่งที่พิมพ์บอก AI</dd></div>
+      <div><dt>Authorize</dt><dd>กดยินยอมให้สคริปต์เข้าถึงไฟล์ของเรา</dd></div>
+      <div><dt>Test deployment</dt><dd>ลิงก์ทดสอบสำหรับคนสร้างเท่านั้น</dd></div>
+      <div><dt>Version</dt><dd>ภาพถ่ายของโค้ด ณ เวลาหนึ่ง เช่น v1, v2</dd></div>
+      <div><dt>URL</dt><dd>ที่อยู่ของหน้าเว็บ (Uniform Resource Locator)</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 7: บท 5 (1) ===== -->
+<section class="page c-pink" aria-label="บทที่ 5 ตอนที่ 1">
+  <span class="folio">7</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--rose)"><rect x="12" y="6" width="16" height="28" rx="8" fill="#fff" stroke="currentColor" stroke-width="2.6"/><circle cx="20" cy="27" r="4" fill="currentColor"/><path d="M20 23V13" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M31 12h4M31 18h3M31 24h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 5 · ตอนที่ 1 จาก 4</p><h2>ลงมือสร้างแอปแรก</h2></div>
+    </div>
+    <p class="lead">แอป "บันทึกอุณหภูมิตู้เย็นเก็บยา" พยาบาลกรอกอุณหภูมิบนแท็บเล็ต ข้อมูลลง Google Sheets และแอปเตือนทันทีเมื่ออยู่นอกช่วง โค้ดตั้งช่วงไว้ 2–8 °C ให้แก้ตามแนวปฏิบัติการเก็บยาของหน่วยงานคุณ</p>
+    <div class="preview" aria-label="ตัวอย่างหน้าตาแอปที่จะได้">
+      <div class="phone">
+        <p class="ph-title">บันทึกอุณหภูมิตู้เย็นยา</p>
+        <p class="ph-field">ตู้เย็น: ตู้วัคซีน ▾</p>
+        <p class="ph-field">อุณหภูมิ (°C): 9.5</p>
+        <p class="ph-field">อักษรย่อ: กพ</p>
+        <p class="ph-btn">บันทึก</p>
+        <p class="ph-warn">บันทึกแล้ว: อุณหภูมินอกช่วง โปรดแจ้งผู้รับผิดชอบ</p>
+      </div>
+      <div class="sheet">
+        <p class="sh-cap">Google Sheets · แผ่นงาน "บันทึก"</p>
+        <div class="table-wrap"><table>
+          <tr><th>วันที่เวลา</th><th>ตู้</th><th>°C</th><th>สถานะ</th><th>ผู้บันทึก</th></tr>
+          <tr><td>05/11 08:02</td><td>ตู้ยา 1</td><td>5</td><td>ปกติ</td><td>กพ</td></tr>
+          <tr><td>05/11 08:04</td><td>ตู้วัคซีน</td><td>9.5</td><td><b style="color:var(--red)">นอกช่วง</b></td><td>กพ</td></tr>
+        </table></div>
+        <p class="src">ข้อมูลตัวอย่างสมมติ</p>
+      </div>
+    </div>
+    <style>
+      .preview { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+      .phone { flex: 0 0 210px; background: #fff; border: 6px solid var(--ink); border-radius: 28px; padding: 16px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+      .ph-title { font-family: var(--font-display); font-size: 15px; }
+      .ph-field { border: 2px solid var(--sky); border-radius: 10px; padding: 4px 8px; }
+      .ph-btn { background: var(--rose); color: #fff; text-align: center; border-radius: 10px; padding: 6px; font-family: var(--font-display); }
+      .ph-warn { color: var(--red); font-size: 12px; line-height: 1.4; }
+      .sheet { flex: 1 1 280px; display: flex; flex-direction: column; gap: 6px; }
+      .sh-cap { font-family: var(--font-display); color: var(--teal); }
+    </style>
+    <h3>ขั้นที่ 1 · สร้าง Google Sheets</h3>
+    <ol class="steps">
+      <li>พิมพ์ <span class="kbd">sheets.new</span> ในแถบที่อยู่ของ Chrome จะได้ชีตใหม่ทันที</li>
+      <li>ตั้งชื่อไฟล์มุมซ้ายบนว่า "บันทึกอุณหภูมิตู้เย็นยา"</li>
+      <li>ตั้งเขตเวลา: ไฟล์ (File) &gt; การตั้งค่า (Settings) &gt; เขตเวลา เลือก (GMT+07:00) Bangkok</li>
+      <li>คัดลอก <b>ID ของชีต</b> จากแถบที่อยู่ คือข้อความระหว่าง <span class="kbd">/d/</span> กับ <span class="kbd">/edit</span> เก็บไว้ใช้ในขั้นที่ 3</li>
+    </ol>
+    <pre class="prompt" style="border-color:var(--blue);background:#F4F9FF">https://docs.google.com/spreadsheets/d/<b style="color:var(--rose)">1AbC...xyz</b>/edit
+                                       ↑ ส่วนสีชมพูนี้คือ ID</pre>
+    <h3>ขั้นที่ 2 · เปิดตัวแก้โค้ด</h3>
+    <p>ในชีตกด <b>ส่วนขยาย (Extensions) &gt; Apps Script</b><sup><a href="#ref-6">[6]</a></sup> จะเปิดแท็บใหม่ที่มีไฟล์ Code.gs กับฟังก์ชันตัวอย่าง myFunction กดที่ "Untitled project" เพื่อตั้งชื่อโปรเจกต์</p>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>ID ของชีต</dt><dd>รหัสประจำไฟล์ที่ไม่ซ้ำ เหมือนเลข HN ของไฟล์</dd></div>
+      <div><dt>Editor</dt><dd>หน้าจอเขียนและแก้โค้ด</dd></div>
+      <div><dt>Project</dt><dd>ชุดไฟล์โค้ดทั้งหมดของแอป 1 ตัว</dd></div>
+      <div><dt>เขตเวลา</dt><dd>ตั้งเวลาตามพื้นที่ ไทยคือ GMT+7</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 8: บท 5 (2) Code.gs ===== -->
+<section class="page c-pink" aria-label="บทที่ 5 ตอนที่ 2">
+  <span class="folio">8</span>
+  <div class="page-body">
+    <h3>ขั้นที่ 3 · วางโค้ดหลังบ้าน (Code.gs)</h3>
+    <p>ลบโค้ดเดิมใน Code.gs ทั้งหมด วางโค้ดด้านล่าง แล้ว <b>แทนคำว่า วาง_ID_ของชีตที่นี่ ด้วย ID จากขั้นที่ 1</b> (เก็บเครื่องหมาย ' ' ไว้) จากนั้นกด <span class="kbd">Ctrl+S</span> เพื่อบันทึก</p>
+    <div class="code">
+      <span class="tag">Code.gs</span>
+      <button class="copy" type="button" data-copy="code-gs">คัดลอก</button>
+<pre id="code-gs">// ===== ตั้งค่า (แก้ได้) =====
+const SPREADSHEET_ID = 'วาง_ID_ของชีตที่นี่';
+const SHEET_NAME = 'บันทึก';
+const MIN_TEMP = 2;   // อุณหภูมิต่ำสุดที่ยอมรับ (°C)
+const MAX_TEMP = 8;   // อุณหภูมิสูงสุดที่ยอมรับ (°C)
+
+// เปิดหน้าเว็บเมื่อมีคนเข้าลิงก์
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('บันทึกอุณหภูมิตู้เย็นยา')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// หาแผ่นงาน ถ้ายังไม่มีให้สร้างพร้อมหัวคอลัมน์
+// ชื่อลงท้ายด้วย _ = หน้าเว็บเรียกใช้ไม่ได้
+function getSheet_() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    sheet.appendRow(['วันที่เวลา', 'ตู้', 'อุณหภูมิ (°C)', 'สถานะ', 'ผู้บันทึก', 'หมายเหตุ']);
+  }
+  return sheet;
+}
+
+// รันครั้งแรกจากตัวแก้โค้ด เพื่ออนุญาตสิทธิ์และสร้างแผ่นงาน
+function setup() {
+  getSheet_();
+}
+
+// บันทึก 1 รายการ (หน้าเว็บเรียกผ่าน google.script.run)
+function saveRecord(form) {
+  const temp = Number(form.temp);
+  if (!form.fridge || form.temp === '' || isNaN(temp) || !form.initials) {
+    throw new Error('กรุณากรอกข้อมูลให้ครบและถูกต้อง');
+  }
+  const status = (temp &lt; MIN_TEMP || temp &gt; MAX_TEMP) ? 'นอกช่วง' : 'ปกติ';
+  getSheet_().appendRow([new Date(), form.fridge, temp, status, form.initials, form.note || '']);
+  return status;
+}
+
+// ดึง 10 รายการล่าสุดมาแสดง
+function getRecent() {
+  const sheet = getSheet_();
+  const last = sheet.getLastRow();
+  if (last &lt; 2) return [];
+  const start = Math.max(2, last - 9);
+  const rows = sheet.getRange(start, 1, last - start + 1, 5).getValues();
+  return rows.reverse().map(function (r) {
+    const time = r[0] instanceof Date
+      ? Utilities.formatDate(r[0], 'Asia/Bangkok', 'dd/MM/yyyy HH:mm')
+      : String(r[0]);
+    return [time, r[1], r[2], r[3], r[4]];
+  });
+}</pre>
+    </div>
+    <div class="box tip"><svg viewBox="0 0 24 24" style="color:var(--teal)"><use href="#i-bulb"/></svg><div><b class="label">อ่านออกก็พอ</b>doGet เปิดหน้า Index · saveRecord ตรวจข้อมูลแล้วเติมแถวใหม่ด้วย appendRow · getRecent อ่าน 10 แถวล่าสุดด้วย getRange กับ getValues<sup><a href="#ref-7">[7]</a></sup> · วันที่ถูกแปลงเป็นข้อความก่อนส่งกลับไปหน้าเว็บ</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>const</dt><dd>ค่าคงที่ แก้ได้ที่บรรทัดเดียว เช่น ช่วงอุณหภูมิ</dd></div>
+      <div><dt>Comment</dt><dd>บรรทัดอธิบายที่ขึ้นต้นด้วย // คอมไม่อ่าน</dd></div>
+      <div><dt>appendRow</dt><dd>คำสั่งเติมแถวใหม่ต่อท้ายชีต</dd></div>
+      <div><dt>getValues</dt><dd>คำสั่งอ่านค่าในช่วงเซลล์ออกมาเป็นตาราง</dd></div>
+      <div><dt>Error</dt><dd>ข้อความแจ้งว่าผิดพลาดตรงไหน</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 9: บท 5 (3) Index.html ===== -->
+<section class="page c-pink" aria-label="บทที่ 5 ตอนที่ 3">
+  <span class="folio">9</span>
+  <div class="page-body">
+    <h3>ขั้นที่ 4 · เพิ่มหน้าบ้าน (Index.html)</h3>
+    <p>กดเครื่องหมาย <b>+</b> ข้างคำว่า Files (ไฟล์) &gt; HTML ตั้งชื่อว่า <b>Index</b> (I ตัวใหญ่ ไม่ต้องพิมพ์ .html) ลบข้อความเดิม วางโค้ดด้านล่าง แล้วบันทึก</p>
+    <div class="code">
+      <span class="tag">Index.html</span>
+      <button class="copy" type="button" data-copy="code-html">คัดลอก</button>
+<pre id="code-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;base target="_top"&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;style&gt;
+  body { font-family: sans-serif; background: #FFF9F4; color: #2A2B45; margin: 0; padding: 16px; }
+  .card { background: #fff; border-radius: 16px; padding: 20px; max-width: 520px; margin: auto; }
+  label { display: block; margin-top: 14px; font-weight: 600; }
+  input, select { width: 100%; font-size: 20px; padding: 12px; margin-top: 6px;
+    border: 2px solid #D6E9FF; border-radius: 12px; box-sizing: border-box; }
+  button { width: 100%; margin-top: 20px; font-size: 22px; padding: 14px; border: 0;
+    border-radius: 12px; background: #B23A60; color: #fff; }
+  #msg { margin-top: 14px; font-size: 18px; }
+  table { width: 100%; margin-top: 16px; border-collapse: collapse; font-size: 16px; }
+  td, th { padding: 6px; border-bottom: 1px solid #eee; text-align: left; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class="card"&gt;
+  &lt;h2&gt;บันทึกอุณหภูมิตู้เย็นยา&lt;/h2&gt;
+  &lt;form id="f"&gt;
+    &lt;label&gt;ตู้เย็น
+      &lt;select name="fridge" required&gt;
+        &lt;option value=""&gt;-- เลือกตู้ --&lt;/option&gt;
+        &lt;option&gt;ตู้ยา 1&lt;/option&gt;
+        &lt;option&gt;ตู้วัคซีน&lt;/option&gt;
+      &lt;/select&gt;
+    &lt;/label&gt;
+    &lt;label&gt;อุณหภูมิ (°C)
+      &lt;input name="temp" type="number" step="0.1" required&gt;
+    &lt;/label&gt;
+    &lt;label&gt;อักษรย่อผู้บันทึก
+      &lt;input name="initials" maxlength="5" required&gt;
+    &lt;/label&gt;
+    &lt;label&gt;หมายเหตุ (ห้ามใส่ข้อมูลผู้ป่วย)
+      &lt;input name="note"&gt;
+    &lt;/label&gt;
+    &lt;button type="submit" id="btn"&gt;บันทึก&lt;/button&gt;
+  &lt;/form&gt;
+  &lt;div id="msg"&gt;&lt;/div&gt;
+  &lt;h3&gt;10 รายการล่าสุด&lt;/h3&gt;
+  &lt;table id="recent"&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  const form = document.getElementById('f');
+  const btn = document.getElementById('btn');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึก...';
+    google.script.run
+      .withSuccessHandler(function (status) {
+        if (status === 'ปกติ') {
+          showMsg('บันทึกแล้ว: อุณหภูมิอยู่ในช่วงปกติ', false);
+        } else {
+          showMsg('บันทึกแล้ว: อุณหภูมินอกช่วง โปรดแจ้งผู้รับผิดชอบ', true);
+        }
+        form.reset();
+        resetButton();
+        loadRecent();
+      })
+      .withFailureHandler(function (err) {
+        showMsg('บันทึกไม่สำเร็จ: ' + err.message, true);
+        resetButton();
+      })
+      .saveRecord(form);
+  });
+
+  function resetButton() {
+    btn.disabled = false;
+    btn.textContent = 'บันทึก';
+  }
+
+  function showMsg(text, warn) {
+    const m = document.getElementById('msg');
+    m.textContent = text;
+    m.style.color = warn ? '#B0342A' : '#136F57';
+  }
+
+  function loadRecent() {
+    google.script.run.withSuccessHandler(function (rows) {
+      const t = document.getElementById('recent');
+      t.innerHTML = '&lt;tr&gt;&lt;th&gt;เวลา&lt;/th&gt;&lt;th&gt;ตู้&lt;/th&gt;&lt;th&gt;°C&lt;/th&gt;&lt;th&gt;สถานะ&lt;/th&gt;&lt;th&gt;ผู้บันทึก&lt;/th&gt;&lt;/tr&gt;';
+      rows.forEach(function (r) {
+        const tr = document.createElement('tr');
+        r.forEach(function (v) {
+          const td = document.createElement('td');
+          td.textContent = v;
+          tr.appendChild(td);
+        });
+        t.appendChild(tr);
+      });
+    }).getRecent();
+  }
+
+  loadRecent();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    </div>
+    <div class="box note"><svg viewBox="0 0 24 24" style="color:var(--blue)"><use href="#i-info"/></svg><div><b class="label">ทำไมเขียนแบบนี้</b>หน้าเว็บส่งทั้งฟอร์มไปให้ saveRecord ผ่าน google.script.run โดยไม่ต้องโหลดหน้าใหม่<sup><a href="#ref-4">[4]</a></sup> และใส่ข้อความในตารางด้วย textContent กันไม่ให้ข้อความที่คนกรอกกลายเป็นโค้ด</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>CSS</dt><dd>ภาษากำหนดสีและหน้าตา อยู่ในส่วน style</dd></div>
+      <div><dt>Form</dt><dd>กลุ่มช่องกรอกและปุ่มส่งข้อมูล</dd></div>
+      <div><dt>Viewport</dt><dd>ตั้งให้หน้าเว็บพอดีกับจอมือถือ</dd></div>
+      <div><dt>textContent</dt><dd>ใส่ข้อความเป็นตัวหนังสือล้วน ปลอดภัยกว่า</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 10: บท 5 (4) ===== -->
+<section class="page c-pink" aria-label="บทที่ 5 ตอนที่ 4">
+  <span class="folio">10</span>
+  <div class="page-body">
+    <h3>ขั้นที่ 5 · รัน setup และอนุญาตสิทธิ์</h3>
+    <ol class="steps">
+      <li>เปิด Code.gs เลือกฟังก์ชัน <b>setup</b> ที่แถบด้านบน แล้วกด <b>Run</b></li>
+      <li>กด <b>Review permissions</b> แล้วเลือกบัญชีของตัวเอง</li>
+      <li>เจอหน้า "Google hasn't verified this app" ให้กด <b>Advanced</b> &gt; <b>Go to [ชื่อโปรเจกต์] (unsafe)</b> &gt; <b>Allow</b><sup><a href="#ref-11">[11]</a></sup></li>
+      <li>กลับไปดูชีต ต้องเห็นแท็บใหม่ชื่อ "บันทึก" พร้อมหัวคอลัมน์</li>
+    </ol>
+    <div class="box warn"><svg viewBox="0 0 24 24" style="color:var(--red)"><use href="#i-alert"/></svg><div><b class="label">กด Advanced ได้เฉพาะโค้ดของเราเอง</b>Apps Script สแกนโค้ดแล้วขอสิทธิ์เท่าที่โค้ดใช้<sup><a href="#ref-8">[8]</a></sup> แอปนี้ขอแค่สิทธิ์เข้า Google Sheets ห้ามทำแบบนี้กับสคริปต์ที่คนอื่นส่งมาโดยไม่รู้ที่มา</div></div>
+    <h3>ขั้นที่ 6 · ทดสอบด้วยลิงก์ทดสอบ</h3>
+    <p>Deploy &gt; Test deployments &gt; เลือก Web app &gt; กด Copy ใต้ลิงก์ แล้วเปิดในเบราว์เซอร์<sup><a href="#ref-3">[3]</a></sup> ลอง 3 กรณี: <b>5 °C</b> (ปกติ) · <b>9.5 °C</b> (นอกช่วง) · <b>เว้นว่าง</b> (ต้องบันทึกไม่ได้)</p>
+    <h3>ขั้นที่ 7 · Deploy เป็นเว็บแอป</h3>
+    <ol class="steps">
+      <li>Deploy &gt; <b>New deployment</b> &gt; กดรูปเฟือง &gt; <b>Web app</b></li>
+      <li>Description พิมพ์ "v1 เวอร์ชันแรก"</li>
+      <li><b>Execute as: Me</b> สคริปต์ทำงานในนามเจ้าของเสมอ<sup><a href="#ref-3">[3]</a></sup> ผู้ใช้จึงบันทึกได้โดยไม่ต้องแชร์ชีตให้ทุกคน</li>
+      <li>เลือก <b>Who has access</b> ตามตาราง แล้วกด Deploy คัดลอกลิงก์ที่ลงท้าย /exec</li>
+    </ol>
+    <div class="table-wrap"><table>
+      <tr><th>Who has access</th><th>ใครเปิดได้</th><th>คำแนะนำ</th></tr>
+      <tr><td>Only myself</td><td>เฉพาะเจ้าของ</td><td>ตอนทดสอบ</td></tr>
+      <tr><td>Anyone within [องค์กร]</td><td>คนที่ใช้บัญชีองค์กรเดียวกัน (มีเฉพาะบัญชี Workspace)</td><td><b>แนะนำสำหรับใช้ในหอ</b></td></tr>
+      <tr><td>Anyone with Google account</td><td>ใครก็ได้ที่ล็อกอิน Google</td><td>เมื่อไม่มีบัญชีองค์กร และแอปไม่มีข้อมูลอ่อนไหว</td></tr>
+      <tr><td>Anyone</td><td>ทุกคนที่มีลิงก์ ไม่ต้องล็อกอิน</td><td>หลีกเลี่ยงสำหรับแอปที่บันทึกข้อมูล</td></tr>
+    </table></div>
+    <h3>ขั้นที่ 8 · เปิดบนแท็บเล็ต</h3>
+    <p>ส่งลิงก์ /exec เข้าแท็บเล็ต แล้วเพิ่มไว้ที่หน้าจอหลัก (Chrome: เมนู ⋮ &gt; เพิ่มลงในหน้าจอหลัก · Safari: ปุ่มแชร์ &gt; เพิ่มไปยังหน้าจอโฮม) จะได้ไอคอนเปิดแอปได้ทันที</p>
+    <h3>ขั้นที่ 9 · อัปเดตโดยใช้ลิงก์เดิม</h3>
+    <div class="box try"><svg viewBox="0 0 24 24" style="color:var(--amber)"><use href="#i-hand"/></svg><div>แก้โค้ดทุกครั้ง: Deploy &gt; <b>Manage deployments</b> &gt; รูปดินสอ &gt; Version เลือก <b>New version</b> &gt; Deploy ลิงก์ /exec เดิมจะใช้โค้ดใหม่ทันที (ถ้ากด New deployment จะได้ลิงก์ใหม่แทน)</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Run</dt><dd>สั่งให้โค้ดทำงาน</dd></div>
+      <div><dt>Permission</dt><dd>สิทธิ์ที่สคริปต์ขอเพื่อเข้าถึงไฟล์</dd></div>
+      <div><dt>Execute as</dt><dd>สคริปต์ทำงานในนามใคร</dd></div>
+      <div><dt>Who has access</dt><dd>ใครเปิดลิงก์แอปได้บ้าง</dd></div>
+      <div><dt>/dev กับ /exec</dt><dd>ลิงก์ทดสอบ กับ ลิงก์ใช้งานจริง</dd></div>
+      <div><dt>Manage deployments</dt><dd>หน้าจัดการเวอร์ชันที่เผยแพร่</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 11: บท 6 (1) ===== -->
+<section class="page c-lav" aria-label="บทที่ 6 ตอนที่ 1">
+  <span class="folio">11</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--grape)"><path d="M7 10a4 4 0 0 1 4-4h18a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H17l-7 6v-6a4 4 0 0 1-3-4z" fill="#fff" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M14 14h12M14 19h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 6 · ตอนที่ 1 จาก 2</p><h2>สั่ง AI ให้เขียน Apps Script</h2></div>
+    </div>
+    <p class="lead">ใช้สูตร Prompt 6 ส่วนเดิมจากคลาส (บทบาท → ปัญหา → ฟีเจอร์ → ข้อมูล → หน้าตา → ข้อจำกัด) แล้วเพิ่ม <b>ส่วนที่ 7: ข้อกำหนดทางเทคนิคของ Apps Script</b> เพราะถ้าไม่บอก AI มักเขียนเว็บแอปทั่วไปที่เอามาใช้ใน Apps Script ไม่ได้</p>
+    <h3>6.1 ส่วนที่ 7 · ใส่ทุกครั้ง</h3>
+    <div class="code">
+      <button class="copy" type="button" data-copy="pr-7">คัดลอก</button>
+<pre class="prompt" id="pr-7">ข้อกำหนดทางเทคนิค:
+- เขียนเป็น Google Apps Script web app ที่ผูกกับ Google Sheets
+- แยกเป็น 2 ไฟล์: Code.gs และ Index.html แสดงโค้ดเต็มทั้ง 2 ไฟล์ ไม่ตัดทอน
+- ใน Code.gs ใช้ doGet() คืนค่า HtmlService.createHtmlOutputFromFile('Index') และเพิ่ม meta viewport สำหรับมือถือ
+- เปิดชีตด้วย SpreadsheetApp.openById(SPREADSHEET_ID) ตั้ง SPREADSHEET_ID เป็นค่าคงที่บรรทัดแรก
+- หน้าเว็บเรียกโค้ดหลังบ้านด้วย google.script.run พร้อม withSuccessHandler และ withFailureHandler
+- ฟังก์ชันที่หน้าเว็บไม่ต้องเรียก ให้ตั้งชื่อลงท้ายด้วย _
+- ส่งวันที่กลับไปที่หน้าเว็บเป็นข้อความที่จัดรูปแบบด้วยเขตเวลา Asia/Bangkok
+- มีฟังก์ชัน setup() สำหรับรันครั้งแรก สร้างแผ่นงานและหัวคอลัมน์ให้อัตโนมัติ
+- ไม่ใช้ไลบรารีหรือไฟล์จากภายนอก
+- ใส่คำอธิบายภาษาไทยสั้น ๆ เหนือแต่ละฟังก์ชัน
+- หลังโค้ด อธิบายทีละขั้นสำหรับมือใหม่ว่าต้องวางไฟล์ไหนตรงไหน และ Deploy อย่างไร</pre>
+    </div>
+    <p class="src">ทุกข้อมาจากแนวทางของ Google: doGet และ HtmlService<sup><a href="#ref-3">[3]</a><a href="#ref-5">[5]</a></sup> · google.script.run และฟังก์ชันลงท้าย _<sup><a href="#ref-4">[4]</a></sup></p>
+    <h3>6.2 Prompt สร้างแอปใหม่</h3>
+    <p>แทนคำใน [วงเล็บเหลี่ยม] แล้ววางส่วนที่ 7 ต่อท้าย</p>
+    <div class="code">
+      <button class="copy" type="button" data-copy="pr-new">คัดลอก</button>
+<pre class="prompt" id="pr-new">คุณคือนักพัฒนา Google Apps Script ที่เข้าใจงานพยาบาล ช่วยสร้างเว็บแอปชื่อ "[ชื่อแอป]" สำหรับ [ใครใช้ เช่น พยาบาลหออายุรกรรมทุกเวร]
+
+ปัญหา: [ใคร ทำอะไร บ่อยแค่ไหน ตอนนี้ทำยังไง เสียอะไร]
+
+ฟีเจอร์:
+1. [ฟีเจอร์ที่ต้องมี ข้อ 1]
+2. [ฟีเจอร์ที่ต้องมี ข้อ 2]
+3. [ฟีเจอร์ที่ต้องมี ข้อ 3]
+
+ข้อมูลที่บันทึกลงชีต (ชื่อแผ่นงาน "[ชื่อแผ่นงาน]"):
+- [ชื่อคอลัมน์] : [ชนิดข้อมูล] : [กฎตรวจสอบ เช่น ตัวเลข 0–300 ห้ามว่าง]
+- วันที่เวลาบันทึก : อัตโนมัติ
+
+หน้าตา: ใช้บนแท็บเล็ตและมือถือ ปุ่มใหญ่ ภาษาไทยทั้งหมด โทนสีพาสเทล แสดงข้อความยืนยันหลังบันทึก และแสดง 10 รายการล่าสุด
+
+ข้อจำกัด:
+- ห้ามมีช่องกรอกชื่อ HN AN เลขบัตรประชาชน หรือข้อมูลที่ระบุตัวผู้ป่วย
+- ผู้บันทึกใช้อักษรย่อ ไม่ใช้ชื่อเต็ม
+- ตรวจข้อมูลทั้งที่หน้าเว็บและใน Code.gs ก่อนบันทึก
+
+[วางส่วนที่ 7 จาก 6.1 ต่อท้ายตรงนี้]</pre>
+    </div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Library</dt><dd>ชุดโค้ดสำเร็จรูปที่คนอื่นเขียนไว้</dd></div>
+      <div><dt>HtmlService</dt><dd>บริการของ Apps Script ที่ส่งหน้าเว็บให้ผู้ใช้</dd></div>
+      <div><dt>Validation</dt><dd>การตรวจว่าข้อมูลที่กรอกถูกต้องก่อนบันทึก</dd></div>
+      <div><dt>Time zone</dt><dd>เขตเวลา ไทยคือ Asia/Bangkok</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 12: บท 6 (2) ===== -->
+<section class="page c-lav" aria-label="บทที่ 6 ตอนที่ 2">
+  <span class="folio">12</span>
+  <div class="page-body">
+    <h3>6.3 Prompt สั่งแก้เมื่อเจอปัญหา</h3>
+    <div class="code">
+      <button class="copy" type="button" data-copy="pr-fix">คัดลอก</button>
+<pre class="prompt" id="pr-fix">แอป Apps Script ที่คุณเขียนให้มีปัญหา
+- สิ่งที่ทำ: [เช่น กดปุ่มบันทึกบนแท็บเล็ต]
+- สิ่งที่เห็น: [เช่น ปุ่มค้างที่ "กำลังบันทึก..." และชีตไม่มีแถวใหม่]
+- สิ่งที่คาดหวัง: [เช่น ขึ้นข้อความ บันทึกแล้ว และมีแถวใหม่ในชีต]
+- ข้อความ error ทั้งหมดจากหน้า Executions: [วางทั้งก้อน]
+ช่วยอธิบายสาเหตุสั้น ๆ แล้วแก้เฉพาะจุดที่เกี่ยวข้อง แสดงไฟล์ที่แก้แบบเต็มไฟล์</pre>
+    </div>
+    <h3>6.4 Prompt เพิ่มฟีเจอร์</h3>
+    <div class="code">
+      <button class="copy" type="button" data-copy="pr-add">คัดลอก</button>
+<pre class="prompt" id="pr-add">แอปตอนนี้ทำงานถูกต้องแล้ว (โค้ดปัจจุบันอยู่ด้านล่าง) ช่วยเพิ่มเพียง 1 ฟีเจอร์: [เช่น ปุ่มกรองดูเฉพาะรายการที่สถานะ "นอกช่วง"]
+ห้ามเปลี่ยนส่วนอื่นที่ทำงานอยู่แล้ว และบอกว่าต้องแก้ไฟล์ไหนบ้าง
+
+Code.gs:
+[วางโค้ดปัจจุบัน]
+
+Index.html:
+[วางโค้ดปัจจุบัน]</pre>
+    </div>
+    <div class="box warn"><svg viewBox="0 0 24 24" style="color:var(--red)"><use href="#i-alert"/></svg><div><b class="label">ก่อนส่งโค้ดให้ AI</b>เช็กว่าในโค้ดไม่มีข้อมูลผู้ป่วยหรือรหัสผ่าน ส่วน ID ของชีตปลอดภัยพอสมควรเพราะเปิดได้เฉพาะคนที่มีสิทธิ์ แต่เปลี่ยนเป็น วาง_ID_ของชีตที่นี่ ก่อนส่งได้จะดีกว่า</div></div>
+    <h3>สั่งแก้ให้ได้ผล</h3>
+    <div class="cards">
+      <div class="card" style="border-style:dashed"><h4 style="color:var(--soft)">แบบที่ไม่ได้ผล</h4><p>"มันไม่ทำงาน แก้ทีค่ะ"</p></div>
+      <div class="card" style="background:var(--lav);border-color:var(--grape)"><h4>แบบที่ได้ผล</h4><p>"กดบันทึกแล้วขึ้น NaN ในช่องอุณหภูมิ ควรเป็นตัวเลข 5.0"</p></div>
+    </div>
+    <ul>
+      <li>แก้ทีละ 1–2 เรื่อง ไม่สั่ง 10 อย่างพร้อมกัน</li>
+      <li>เก็บเวอร์ชันที่ใช้ได้ไว้ก่อนแก้ครั้งใหญ่ (คัดลอกโค้ดไปวางใน Google Docs)</li>
+      <li>ติดเกิน 10 นาที เปิดแชทใหม่แล้ววางโค้ดล่าสุดพร้อม Prompt 6.3</li>
+    </ul>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Error</dt><dd>ข้อความแจ้งว่าโค้ดผิดพลาดตรงไหน</dd></div>
+      <div><dt>Executions</dt><dd>หน้าประวัติการรันสคริปต์ พร้อม error</dd></div>
+      <div><dt>NaN</dt><dd>Not a Number ค่าที่ควรเป็นตัวเลขแต่ไม่ใช่</dd></div>
+      <div><dt>Feature</dt><dd>ความสามารถหนึ่งอย่างของแอป</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 13: บท 7 ===== -->
+<section class="page c-sky" aria-label="บทที่ 7">
+  <span class="folio">13</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--blue)"><circle cx="17" cy="17" r="9" fill="#fff" stroke="currentColor" stroke-width="2.8"/><path d="M24 24l8 8" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><path d="M13 17h8M17 13v8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 7</p><h2>แอปไม่ทำงาน ทำยังไงดี</h2></div>
+    </div>
+    <p class="lead">ดูหน้า <b>Executions</b> ในแถบซ้ายของตัวแก้โค้ดก่อนเสมอ หน้านี้แสดงสถานะการรันทุกครั้ง เช่น Completed, Failed, Running<sup><a href="#ref-9">[9]</a></sup> กดแถว Failed จะเห็น error เต็ม คัดลอกไปใส่ Prompt 6.3 ได้เลย</p>
+    <h3>เช็กลิสต์ก่อนแชร์</h3>
+    <div class="cards">
+      <div class="card"><p>☐ ค่าปกติบันทึกได้ และลงคอลัมน์ถูก<br>☐ ค่านอกช่วงขึ้นคำเตือน<br>☐ เว้นว่างหรือใส่ตัวอักษรแล้วบันทึกไม่ได้<br>☐ เวลาในชีตตรงเวลาไทย</p></div>
+      <div class="card"><p>☐ เปิดบนแท็บเล็ตได้ ปุ่มกดง่าย<br>☐ เพื่อน 1 คนลองด้วยบัญชีของเขาเอง<br>☐ ไม่มีช่องเก็บข้อมูลที่ระบุตัวผู้ป่วย</p></div>
+    </div>
+    <h3>ปัญหาที่เจอบ่อย</h3>
+    <div class="table-wrap"><table>
+      <tr><th style="width:30%">อาการ</th><th style="width:30%">สาเหตุที่พบบ่อย</th><th>วิธีแก้</th></tr>
+      <tr><td>แก้โค้ดแล้ว ลิงก์ /exec ยังเหมือนเดิม</td><td>ยังไม่ Deploy เวอร์ชันใหม่</td><td>Manage deployments &gt; Edit &gt; New version</td></tr>
+      <tr><td>Script function not found: doGet</td><td>ไม่มี doGet สะกดผิด หรือยังไม่บันทึก</td><td>ตรวจตัวพิมพ์เล็กใหญ่ แล้วกด Ctrl+S</td></tr>
+      <tr><td>No HTML file named Index</td><td>ชื่อไฟล์ไม่ตรงกับในโค้ด</td><td>เปลี่ยนชื่อไฟล์เป็น Index (I ใหญ่)</td></tr>
+      <tr><td>ขึ้นคำว่า permission หรือ openById</td><td>ยังไม่อนุญาตสิทธิ์ หรือ ID ผิด</td><td>รัน setup อีกครั้ง เทียบ ID กับแถบที่อยู่ของชีต</td></tr>
+      <tr><td>ปุ่มค้าง "กำลังบันทึก..."</td><td>หลังบ้านพัง แต่ไม่มี withFailureHandler</td><td>ดู error ใน Executions แล้วสั่ง AI เพิ่ม withFailureHandler<sup><a href="#ref-4">[4]</a></sup></td></tr>
+      <tr><td>เปิดลิงก์แล้วเปิดไฟล์ไม่ได้</td><td>บัญชีไม่มีสิทธิ์ หรือล็อกอินหลายบัญชีในเบราว์เซอร์เดียว</td><td>ตรวจ Who has access ลองเปิดในหน้าต่างไม่ระบุตัวตน</td></tr>
+      <tr><td>Exceeded maximum execution time</td><td>รันเกิน 6 นาทีต่อครั้ง<sup><a href="#ref-9">[9]</a></sup></td><td>ให้ AI อ่านเขียนชีตครั้งเดียวเป็นก้อน</td></tr>
+    </table></div>
+    <div class="box tip"><svg viewBox="0 0 24 24" style="color:var(--teal)"><use href="#i-bulb"/></svg><div><b class="label">ส่องค่าระหว่างทาง</b>เพิ่ม <span class="kbd">console.log(ค่าที่อยากดู)</span> ใน Code.gs แล้วรันใหม่ ค่าจะขึ้นใน Execution log ส่วนโค้ดใน Index.html ดูได้ด้วยปุ่ม F12 แท็บ Console บนโน้ตบุ๊ก</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>Log</dt><dd>บันทึกข้อความที่โค้ดพิมพ์ออกมาระหว่างทำงาน</dd></div>
+      <div><dt>console.log</dt><dd>คำสั่งพิมพ์ค่าออกมาดูในล็อก</dd></div>
+      <div><dt>Debug</dt><dd>การหาและแก้จุดผิดพลาดในโค้ด</dd></div>
+      <div><dt>Variable</dt><dd>กล่องเก็บค่าที่ตั้งชื่อไว้ เช่น temp</dd></div>
+      <div><dt>F12 / Console</dt><dd>เครื่องมือในเบราว์เซอร์ ดู error ของหน้าเว็บ</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 14: บท 8 ===== -->
+<section class="page c-pink" aria-label="บทที่ 8">
+  <span class="folio">14</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--rose)"><path d="M20 5l12 5v9c0 8-5 13-12 16C13 32 8 27 8 19v-9z" fill="#fff" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M15 20l4 4 7-8" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 8</p><h2>ปลอดภัยไว้ก่อน</h2></div>
+    </div>
+    <div class="box warn"><svg viewBox="0 0 24 24" style="color:var(--red)"><use href="#i-alert"/></svg><div><b class="label">กฎเหล็กข้อเดียว</b>แอปที่พยาบาลสร้างเองต้อง <b>ไม่เก็บข้อมูลที่ระบุตัวผู้ป่วยได้</b> เว้นแต่ฝ่าย IT และ DPO ของโรงพยาบาลอนุมัติ เพราะข้อมูลในชีตอยู่บนเซิร์ฟเวอร์ของ Google ไม่ใช่ระบบของโรงพยาบาล และข้อมูลสุขภาพเป็นข้อมูลอ่อนไหวตาม PDPA มาตรา 26<sup><a href="#ref-12">[12]</a></sup></div></div>
+    <h3>ไฟจราจรข้อมูล</h3>
+    <div class="lights">
+      <div class="light" style="background:var(--mint)"><span style="background:var(--teal)">เขียว · เก็บได้</span><p>อุณหภูมิตู้เย็น รายการพัสดุ ผลเช็กรถ Emergency งานโครงการ</p></div>
+      <div class="light" style="background:var(--lemon)"><span style="background:var(--amber)">เหลือง · ระวัง</span><p>อักษรย่อเจ้าหน้าที่ จำนวนผู้ป่วยรวมต่อเวร ได้ถ้าย้อนกลับหาตัวคนไม่ได้</p></div>
+      <div class="light" style="background:var(--red-soft)"><span style="background:var(--red)">แดง · ห้าม</span><p>ชื่อ HN AN เลขบัตร เบอร์โทร รูปผู้ป่วย เตียง + อายุ + การวินิจฉัย</p></div>
+    </div>
+    <style>
+      .lights { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+      .light { border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; }
+      .light span { align-self: flex-start; color: #fff; font-family: var(--font-display); padding: 1px 12px; border-radius: 999px; }
+    </style>
+    <h3>ตั้งค่าให้ปลอดภัย</h3>
+    <ul>
+      <li><b>จำกัดคนแก้ชีต:</b> ทุกคนที่แก้ชีตได้จะเห็นและรันโค้ดได้ด้วย<sup><a href="#ref-6">[6]</a></sup></li>
+      <li><b>Who has access แคบที่สุด:</b> ในหน่วยงานใช้ "Anyone within [องค์กร]" หลีกเลี่ยง "Anyone"</li>
+      <li><b>ซ่อนฟังก์ชันภายใน:</b> ตั้งชื่อลงท้ายด้วย _<sup><a href="#ref-4">[4]</a></sup> สำคัญมากเมื่อใช้ Execute as: Me</li>
+      <li><b>ไม่ส่ง token ไปหน้าเว็บ:</b> Google เตือนว่า OAuth token ให้สิทธิ์เข้าถึงข้อมูลของเราได้<sup><a href="#ref-3">[3]</a></sup></li>
+      <li><b>กันข้อความกลายเป็นสูตร:</b> ถ้ามีช่องข้อความอิสระ ให้สั่ง AI ป้องกันข้อความที่ขึ้นต้นด้วย = + − @</li>
+      <li><b>สำรองข้อมูล:</b> ใช้ ไฟล์ &gt; ประวัติเวอร์ชัน และดาวน์โหลดสำเนาตามรอบของหน่วยงาน</li>
+    </ul>
+    <h3>ตอนใช้ AI ช่วยเขียนโค้ด</h3>
+    <p>ตามแนวทาง AI ฉบับ 1.0 ของ สคส. (ราชกิจจานุเบกษา 2 พ.ย. 2569)<sup><a href="#ref-13">[13]</a></sup> Prompt และคำตอบของ AI อาจเป็นข้อมูลส่วนบุคคลได้ <b>อย่าคัดลอกข้อมูลจริงจากชีตไปวางให้ AI</b> คนต้องตรวจโค้ดและผลลัพธ์จริง และถ้าเผลอป้อนข้อมูลผู้ป่วย ให้แจ้ง DPO ทันที เพราะองค์กรต้องแจ้งเหตุภายใน 72 ชั่วโมง (มาตรา 37 (4))</p>
+    <div class="box note"><svg viewBox="0 0 24 24" style="color:var(--blue)"><use href="#i-info"/></svg><div><b class="label">ความปลอดภัยทางคลินิก</b>แอปที่ทำเองเป็นเครื่องมือช่วยงาน ไม่ใช่ระบบเวชระเบียน (HIS) ต้องมีผู้รับผิดชอบดูแล และมีแผนสำรอง เช่น ใบบันทึกกระดาษ เมื่อเน็ตหรือ Google ใช้งานไม่ได้</div></div>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>PDPA</dt><dd>พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562</dd></div>
+      <div><dt>สคส.</dt><dd>สำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคล</dd></div>
+      <div><dt>DPO</dt><dd>เจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคลขององค์กร</dd></div>
+      <div><dt>OAuth / Token</dt><dd>ระบบอนุญาตสิทธิ์ / กุญแจดิจิทัล ต้องเก็บเป็นความลับ</dd></div>
+      <div><dt>Backup</dt><dd>สำเนาสำรองไว้กู้คืนเมื่อข้อมูลหาย</dd></div>
+      <div><dt>HIS</dt><dd>Hospital Information System ระบบสารสนเทศ รพ.</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 15: บท 9 ===== -->
+<section class="page c-mint" aria-label="บทที่ 9">
+  <span class="folio">15</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--teal)"><path d="M20 5c6 5 8 12 6 20h-12c-2-8 0-15 6-20z" fill="#fff" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><circle cx="20" cy="15" r="3" fill="currentColor"/><path d="M14 22l-5 6 6-1M26 22l5 6-6-1M17 29l3 6 3-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div><p class="eyebrow">บทที่ 9</p><h2>ไปต่อได้อีก</h2></div>
+    </div>
+    <p class="lead">พอแอปแรกทำงานได้ ใช้ Prompt 6.4 เพิ่มความสามารถทีละเรื่อง ไอเดียด้านล่างเรียงจากง่ายไปยาก</p>
+    <div class="cards">
+      <div class="card"><h4>กราฟอุณหภูมิ</h4><p>ทำในชีตเองได้เลย: แทรก &gt; แผนภูมิ ไม่ต้องเขียนโค้ด</p></div>
+      <div class="card"><h4>เมนูในชีต</h4><p>เปิดชีตแล้วมีเมนู "สรุปรายสัปดาห์" ให้กด · ใส่คำว่า onOpen และ custom menu ใน Prompt<sup><a href="#ref-6">[6]</a></sup></p></div>
+      <div class="card"><h4>อีเมลสรุปทุกเช้า</h4><p>ส่งรายการ "นอกช่วง" ให้หัวหน้าหอ · ใส่ time-driven trigger และ MailApp (บัญชีส่วนตัวส่งได้ 100 ผู้รับต่อวัน<sup><a href="#ref-9">[9]</a></sup>)</p></div>
+      <div class="card"><h4>หลายคนบันทึกพร้อมกัน</h4><p>กันข้อมูลชนกัน · ใส่คำว่า LockService ใน Prompt</p></div>
+    </div>
+    <h3>แอปตัวถัดไป</h3>
+    <div class="cards">
+      <div class="card" style="background:var(--sky);border-color:transparent"><h4>เช็กรถ Emergency</h4><p>แยกแท็บอุปกรณ์และยา เตือนของขาดและใกล้หมดอายุ</p></div>
+      <div class="card" style="background:var(--lemon);border-color:transparent"><h4>นับสต็อกพัสดุ</h4><p>สรุปรายการที่ต้องเบิก และจำนวนที่ต้องเติม</p></div>
+      <div class="card" style="background:var(--lav);border-color:transparent"><h4>To-do list โครงการ</h4><p>ติดตามงาน CQI งานอบรม และกำหนดส่ง</p></div>
+    </div>
+    <div class="box try"><svg viewBox="0 0 24 24" style="color:var(--amber)"><use href="#i-hand"/></svg><div><b class="label">ลองทำ</b>หยิบ Prompt จากเอกสาร "แบบทดสอบก่อนเรียน และ Prompt พร้อมใช้ 5 ชุด" มาดัดแปลง เปลี่ยนจากเก็บในเครื่องเป็นเก็บใน Google Sheets แล้ววางส่วนที่ 7 จากบทที่ 6 ต่อท้าย</div></div>
+    <div class="finish">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="#FFD3E0"/><path d="M60 90s-28-16-28-36a15 15 0 0 1 28-7 15 15 0 0 1 28 7c0 20-28 36-28 36z" fill="#fff" stroke="#B8395F" stroke-width="5" stroke-linejoin="round"/></svg>
+      <p>แอปตัวที่สองจะเร็วกว่าตัวแรกเสมอ<br>ลองทำภายในหนึ่งสัปดาห์ ขณะที่ยังจำขั้นตอนได้</p>
+    </div>
+    <style>
+      .finish { display: flex; align-items: center; gap: 16px; background: #fff; border-radius: 20px; padding: 14px 18px; border: 2px dashed var(--pink); }
+      .finish svg { width: 72px; height: 72px; flex: none; }
+      .finish p { font-family: var(--font-display); font-size: 19px; line-height: 1.5; }
+    </style>
+  </div>
+  <footer class="terms">
+    <div class="t-head"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>ศัพท์ในหน้านี้</div>
+    <dl>
+      <div><dt>onOpen</dt><dd>ฟังก์ชันที่ทำงานเองเมื่อเปิดไฟล์</dd></div>
+      <div><dt>Custom menu</dt><dd>เมนูที่เราสร้างเพิ่มในชีต</dd></div>
+      <div><dt>MailApp</dt><dd>บริการส่งอีเมลของ Apps Script</dd></div>
+      <div><dt>LockService</dt><dd>กันหลายคนเขียนข้อมูลชนกัน</dd></div>
+      <div><dt>CQI</dt><dd>การพัฒนาคุณภาพอย่างต่อเนื่อง</dd></div>
+    </dl>
+  </footer>
+</section>
+
+<!-- ===== หน้า 16: อภิธานศัพท์ ===== -->
+<section class="page c-lav" aria-label="อภิธานศัพท์รวม">
+  <span class="folio">16</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 24 24" style="color:var(--grape)"><use href="#i-book"/></svg></div>
+      <div><p class="eyebrow">ท้ายเล่ม</p><h2>อภิธานศัพท์รวม</h2></div>
+    </div>
+    <div class="gloss">
+      <p><b>/dev, /exec</b> ลิงก์ทดสอบ / ลิงก์ใช้งานจริง</p>
+      <p><b>.gs</b> ไฟล์โค้ดหลังบ้านของ Apps Script</p>
+      <p><b>API</b> ตัวเชื่อมให้โปรแกรมคุยกัน</p>
+      <p><b>appendRow</b> เติมแถวใหม่ต่อท้ายชีต</p>
+      <p><b>Asynchronous</b> สั่งแล้วไม่รอ ผลมาทีหลัง</p>
+      <p><b>Authorize</b> กดยินยอมให้สคริปต์เข้าถึงไฟล์</p>
+      <p><b>Backup</b> สำเนาสำรองข้อมูล</p>
+      <p><b>Bound script</b> สคริปต์ที่ผูกกับไฟล์ชีต</p>
+      <p><b>Cloud</b> คอมของผู้ให้บริการที่ใช้ผ่านเน็ต</p>
+      <p><b>Comment</b> บรรทัดอธิบายที่ขึ้นต้นด้วย //</p>
+      <p><b>console.log</b> พิมพ์ค่าออกมาดูในล็อก</p>
+      <p><b>const</b> ค่าคงที่ในโค้ด</p>
+      <p><b>CSS</b> ภาษากำหนดสีและหน้าตาเว็บ</p>
+      <p><b>Debug</b> หาและแก้จุดผิดพลาด</p>
+      <p><b>Deploy</b> นำแอปขึ้นใช้งานจริง ได้ลิงก์</p>
+      <p><b>doGet</b> ฟังก์ชันที่ทำงานเมื่อเปิดลิงก์แอป</p>
+      <p><b>DPO</b> เจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคล</p>
+      <p><b>Editor</b> หน้าจอเขียนและแก้โค้ด</p>
+      <p><b>Error</b> ข้อความแจ้งว่าผิดพลาดตรงไหน</p>
+      <p><b>Execute as</b> สคริปต์ทำงานในนามใคร</p>
+      <p><b>Executions</b> หน้าประวัติการรันสคริปต์</p>
+      <p><b>Frontend / Backend</b> หน้าบ้าน / หลังบ้าน</p>
+      <p><b>Function</b> ชุดคำสั่งที่ตั้งชื่อไว้</p>
+      <p><b>getValues</b> อ่านค่าในช่วงเซลล์</p>
+      <p><b>google.script.run</b> ตัวเชื่อมหน้าเว็บกับ Code.gs</p>
+      <p><b>Google Workspace</b> ชุดแอป Google แบบองค์กร</p>
+      <p><b>Handler</b> คำสั่งรอรับเหตุการณ์</p>
+      <p><b>HIS</b> ระบบสารสนเทศโรงพยาบาล</p>
+      <p><b>HTML</b> ภาษาโครงสร้างหน้าเว็บ</p>
+      <p><b>ID ของชีต</b> รหัสประจำไฟล์</p>
+      <p><b>JavaScript</b> ภาษาที่ Apps Script ใช้</p>
+      <p><b>Library</b> ชุดโค้ดสำเร็จรูป</p>
+      <p><b>LockService</b> กันเขียนข้อมูลชนกัน</p>
+      <p><b>Log</b> บันทึกข้อความระหว่างโค้ดทำงาน</p>
+      <p><b>MVP</b> เวอร์ชันแรกที่เล็กที่สุดแต่ใช้ได้</p>
+      <p><b>OAuth / Token</b> ระบบอนุญาตสิทธิ์ / กุญแจดิจิทัล</p>
+      <p><b>onOpen</b> ทำงานเองเมื่อเปิดไฟล์</p>
+      <p><b>PDPA</b> พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล 2562</p>
+      <p><b>Prompt</b> คำสั่งที่พิมพ์บอก AI</p>
+      <p><b>Quota</b> ปริมาณสูงสุดที่ใช้ได้</p>
+      <p><b>Script</b> ชุดคำสั่งสั้น ๆ</p>
+      <p><b>Trigger</b> ตัวตั้งเวลาให้สคริปต์ทำงานเอง</p>
+      <p><b>URL</b> ที่อยู่ของหน้าเว็บ</p>
+      <p><b>Validation</b> ตรวจข้อมูลก่อนบันทึก</p>
+      <p><b>Variable</b> กล่องเก็บค่าที่ตั้งชื่อไว้</p>
+      <p><b>Version</b> ภาพถ่ายโค้ด ณ เวลาหนึ่ง</p>
+      <p><b>Viewport</b> ตั้งหน้าเว็บให้พอดีจอมือถือ</p>
+      <p><b>Who has access</b> ใครเปิดลิงก์แอปได้</p>
+      <p><b>Workflow</b> ลำดับขั้นตอนการทำงาน</p>
+    </div>
+    <style>
+      .gloss { columns: 2 260px; column-gap: 24px; font-size: 14px; line-height: 1.5; }
+      .gloss p { break-inside: avoid; padding: 4px 0; border-bottom: 1px dashed var(--line); }
+      .gloss b { color: var(--grape); }
+    </style>
+  </div>
+</section>
+
+<!-- ===== หน้า 17: แหล่งอ้างอิง ===== -->
+<section class="page c-sky" aria-label="แหล่งอ้างอิง">
+  <span class="folio">17</span>
+  <div class="page-body">
+    <div class="chap-head">
+      <div class="badge"><svg viewBox="0 0 40 40" style="color:var(--blue)"><path d="M16 24a6 6 0 0 0 8.5 0l5-5a6 6 0 0 0-8.5-8.5l-1.5 1.5M24 16a6 6 0 0 0-8.5 0l-5 5a6 6 0 0 0 8.5 8.5l1.5-1.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></div>
+      <div><p class="eyebrow">ท้ายเล่ม</p><h2>แหล่งอ้างอิง</h2></div>
+    </div>
+    <p>เนื้อหาด้านเทคนิคอ้างอิงเอกสารทางการของ Google เป็นหลัก เมนูและตัวเลขขีดจำกัดอาจเปลี่ยนได้ ควรตรวจสอบก่อนสอนหรือใช้งานจริง</p>
+    <h3>เอกสารทางการของ Google</h3>
+    <ol class="refs">
+      <li id="ref-1"><a href="https://developers.google.com/apps-script">Apps Script (หน้าหลัก)</a> · คำนิยาม Apps Script</li>
+      <li id="ref-2"><a href="https://developers.google.com/apps-script/overview">Apps Script Overview</a> · ไม่ต้องติดตั้ง ทำงานบนเซิร์ฟเวอร์ Google</li>
+      <li id="ref-3"><a href="https://developers.google.com/apps-script/guides/web">Web Apps</a> · doGet, Deploy, Test deployments, Execute as</li>
+      <li id="ref-4"><a href="https://developers.google.com/apps-script/guides/html/communication">HTML Service: Communicate with Server Functions</a> · google.script.run, handlers, ฟังก์ชันลงท้าย _</li>
+      <li id="ref-5"><a href="https://developers.google.com/apps-script/reference/html/html-service">Class HtmlService</a> · createHtmlOutputFromFile</li>
+      <li id="ref-6"><a href="https://developers.google.com/apps-script/guides/bound">Container-bound Scripts</a> · สคริปต์ผูกกับชีต สิทธิ์เข้าถึง</li>
+      <li id="ref-7"><a href="https://developers.google.com/apps-script/guides/sheets">Extending Google Sheets</a> · อ่านและเขียนข้อมูลชีต</li>
+      <li id="ref-8"><a href="https://developers.google.com/apps-script/guides/services/authorization">Authorization for Google Services</a> · การอนุญาตสิทธิ์</li>
+      <li id="ref-9"><a href="https://developers.google.com/apps-script/guides/services/quotas">Quotas for Google Services</a> · ขีดจำกัดและหน้า Executions</li>
+    </ol>
+    <h3>แหล่งเสริม</h3>
+    <ol class="refs" start="10">
+      <li id="ref-10"><a href="https://gist.github.com/tanaikech/b2e0325a28efe7c609e4688ec22ee22c">tanaikech: Web Apps</a> · การ Deploy เวอร์ชันใหม่หลังแก้โค้ด</li>
+      <li id="ref-11"><a href="https://publish.obsidian.md/eriktuck/base/Google+Apps+Script/authorization">Erik Tuck: Google Apps Script authorization</a> · หน้าจอแอปที่ยังไม่ผ่านการยืนยัน</li>
+    </ol>
+    <h3>กฎหมายและแนวทางในประเทศไทย</h3>
+    <ol class="refs" start="12">
+      <li id="ref-12">พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 · มาตรา 26, 28–29, 37 (4)</li>
+      <li id="ref-13">คณะกรรมการคุ้มครองข้อมูลส่วนบุคคล. แนวทางการดำเนินการด้านการคุ้มครองข้อมูลส่วนบุคคลเกี่ยวกับการพัฒนาและการใช้งานเทคโนโลยีปัญญาประดิษฐ์ ฉบับ 1.0. ราชกิจจานุเบกษา 2 พฤศจิกายน 2569</li>
+    </ol>
+    <h3>เอกสารประกอบหลักสูตร</h3>
+    <ol class="refs" start="14">
+      <li>AI101 บทที่ 1, 3 และ 4 · Personal Web App, ส่วนประกอบเว็บแอป, MVP และ Deploy</li>
+      <li>หลักสูตรพื้นฐานการสร้างเว็บแอปสำหรับพยาบาล และเอกสาร "แบบทดสอบก่อนเรียน และ Prompt พร้อมใช้ 5 ชุด"</li>
+    </ol>
+    <style>
+      .refs { font-size: 14.5px; gap: 6px; }
+      .refs li:target { background: var(--lemon); border-radius: 8px; }
+    </style>
+  </div>
+</section>
+
+</main>
+<script>
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if (!el) return;
+      var text = el.textContent;
+      var done = function (ok) {
+        btn.textContent = ok ? 'คัดลอกแล้ว' : 'คัดลอกไม่ได้ ให้ลากเลือกข้อความแทน';
+        setTimeout(function () { btn.textContent = 'คัดลอก'; }, 2200);
+      };
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+      } catch (e) { done(false); }
+    });
+  });
+</script>
+</body>
+</html>
